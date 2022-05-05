@@ -1,6 +1,6 @@
 <template>
   <div class="blog-card">
-    <div class="icons">
+    <div v-show="editPost" class="icons">
       <div class="icon">
         <Edit class="edit" />
       </div>
@@ -35,6 +35,11 @@ export default {
     Edit,
     Delete,
   },
+  computed: {
+    editPost() {
+      return this.$store.state.editPost;
+    },
+  },
 };
 </script>
 
@@ -48,6 +53,8 @@ export default {
   background-color: #fff;
   min-height: 420px;
   transition: 0.5s ease all;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
 
   &:hover {
     transform: rotateZ(-1deg) scale(1.01);

@@ -10,7 +10,7 @@
       <div class="container">
         <h3>view More Recent Blogs</h3>
         <div class="blog-cards">
-          <BlogCards
+          <BlogCard
             :post="post"
             v-for="(post, index) in sampleBlogCards"
             :key="index"
@@ -31,14 +31,14 @@
 
 <script>
 import BlogPost from "../components/BlogPost.vue";
-import BlogCards from "../components/BlogCard.vue";
+import BlogCard from "../components/BlogCard.vue";
 import Arrow from "../assets/Icons/arrow-right-light.svg";
 
 export default {
   name: "Home",
   components: {
     BlogPost,
-    BlogCards,
+    BlogCard,
     Arrow,
   },
   data() {
@@ -62,29 +62,12 @@ export default {
           blogCoverPhoto: "designed-for-everyone",
         },
       ],
-      sampleBlogCards: [
-        {
-          blogTitle: "Blog Card #1",
-          blogCoverPhoto: "stock-1",
-          blogData: "May 1, 2021",
-        },
-        {
-          blogTitle: "Blog Card #2",
-          blogCoverPhoto: "stock-2",
-          blogData: "May 1, 2021",
-        },
-        {
-          blogTitle: "Blog Card #3",
-          blogCoverPhoto: "stock-3",
-          blogData: "May 1, 2021",
-        },
-        {
-          blogTitle: "Blog Card #4",
-          blogCoverPhoto: "stock-4",
-          blogData: "May 1, 2021",
-        },
-      ],
     };
+  },
+  computed: {
+    sampleBlogCards() {
+      return this.$store.state.sampleBlogCards;
+    },
   },
 };
 </script>
