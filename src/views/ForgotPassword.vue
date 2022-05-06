@@ -34,12 +34,13 @@
 import email from "../assets/Icons/envelope-regular.svg";
 import Modal from "../components/Modal.vue";
 import Loading from "../components/Loading.vue";
+import { getAuth, sendPasswordResetEmail } from "firebase/auth";
 export default {
   name: "ForgotPassword",
   data() {
     return {
-      email: null,
-      modalActive: null,
+      email: "",
+      modalActive: false,
       modalMessage: "",
       loading: null,
     };
@@ -47,10 +48,22 @@ export default {
   methods: {
     closeModal() {
       this.modalActive = !this.modalActive;
+      this.email = "";
     },
     resetPassword() {
-      this.modalActive = !this.modalActive;
-      this.modalMessage = "Do you wanna build a snowman";
+      this.loading = true;
+      sendPasswordResetEmail(getAuth(), this.email)
+        .then(() => {
+          this.modalMessage =
+            "If your account exists, you will receive a email";
+          this.loading = false;
+          this.modalActive = true;
+        })
+        .catch((err) => {
+          this.modalMessage = err.message;
+          this.loading = false;
+          this.modalActive = true;
+        });
     },
   },
   components: {
