@@ -41,7 +41,7 @@ export default {
       email: null,
       modalActive: null,
       modalMessage: "",
-      loading: true,
+      loading: null,
     };
   },
   methods: {

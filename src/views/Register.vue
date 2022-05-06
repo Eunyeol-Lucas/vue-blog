@@ -29,8 +29,9 @@
           <input type="password" placeholder="Password" v-model="password" />
           <password class="icon" />
         </div>
+        <div v-show="error" class="error">{{ errorMsg }}</div>
       </div>
-      <button>Sign Up</button>
+      <button @click.prevent="register">Sign Up</button>
       <div class="angle"></div>
     </form>
     <div class="background"></div>
@@ -41,6 +42,9 @@
 import email from "../assets/Icons/envelope-regular.svg";
 import password from "../assets/Icons/lock-alt-solid.svg";
 import user from "../assets/Icons/user-alt-light.svg";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { dbService } from "../firebase/firebaseInit.js";
+import { doc, setDoc } from "firebase/firestore";
 
 export default {
   name: "Register",
@@ -56,7 +60,47 @@ export default {
       username: null,
       email: null,
       password: null,
+      error: null,
+      errorMsg: "",
     };
+  },
+  methods: {
+    async register() {
+      if (
+        this.email !== "" &&
+        this.password !== "" &&
+        this.firstName !== "" &&
+        this.lastName !== "" &&
+        this.username !== ""
+      ) {
+        this.error = false;
+        this.errorMsg = "";
+        try {
+          const firebaseAuth = await getAuth();
+          const createUser = await createUserWithEmailAndPassword(
+            firebaseAuth,
+            this.email,
+            this.password
+          );
+          const result = await createUser;
+          const dataBase = doc(dbService, "users", result.user.uid);
+          await setDoc(dataBase, {
+            firstName: this.firstName,
+            lastName: this.lastName,
+            username: this.username,
+            email: this.email,
+          });
+          this.$router.push({ name: "Login" });
+          return;
+        } catch (error) {
+          this.error = true;
+          this.errorMsg = error.message;
+          return;
+        }
+      }
+      this.error = true;
+      this.errorMsg = "Please fill out all the fields!";
+    },
   },
 };
 </script>

@@ -31,6 +31,7 @@
 <script>
 import email from "../assets/Icons/envelope-regular.svg";
 import password from "../assets/Icons/lock-alt-solid.svg";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
 export default {
   name: "Login",
@@ -42,8 +43,13 @@ export default {
     return {
       email: null,
       password: null,
+      error: null,
+      errorMsg: "",
     };
   },
+  methods : {
+    
+  }
 };
 </script>
 

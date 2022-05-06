@@ -34,8 +34,9 @@ export default {
     border: 3px solid transparent;
     border-top-color: #fff;
     border-bottom-color: #fff;
+    border-right-color: #fff;
     border-radius: 50%;
-    animation: spin ease 1000ms infinite;
+    animation: spin ease .75s infinite;
   }
 }
 </style>
