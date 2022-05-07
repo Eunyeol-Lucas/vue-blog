@@ -2,7 +2,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 import { getAuth } from "firebase/auth";
 import { dbService } from "../firebase/firebaseInit";
-import { Doc, getDoc } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 
 Vue.use(Vuex);
 
@@ -44,6 +44,9 @@ export default new Vuex.Store({
     toggleEditPost(state, payload) {
       state.editPost = payload;
     },
+    updateUser(state, payload) {
+      state.user = payload;
+    },
     setProfileInfo(state, payload) {
       state.profileId = payload.id;
       state.profileEmail = payload.data().email;
@@ -59,10 +62,11 @@ export default new Vuex.Store({
   },
   actions: {
     async getCurrentUser({ commit }) {
-      const dataBase = await Doc(dbService, "users", getAuth().currentUser.uid);
+      const dataBase = await doc(dbService, "users", getAuth().currentUser.uid);
       const dbResults = await getDoc(dataBase);
       commit("setProfileInfo", dbResults);
       commit("setProfileInitials");
+      console.log(dbResults.data());
     },
   },
   modules: {},

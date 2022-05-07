@@ -15,6 +15,7 @@
             >Login/Register</router-link
           >
         </ul>
+        
       </div>
     </nav>
     <menuIcon @click="toggleMobileNav" class="menu-icon" v-show="mobile" />
