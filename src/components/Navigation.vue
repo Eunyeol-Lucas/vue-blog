@@ -11,7 +11,7 @@
           <router-link class="link" :to="{ name: 'Home' }">Home</router-link>
           <router-link class="link" :to="{ name: 'Blogs' }">Blogs</router-link>
           <router-link class="link" to="#">Create Post</router-link>
-          <router-link class="link" :to="{ name: 'Login' }"
+          <router-link v-if="!user" class="link" :to="{ name: 'Login' }"
             >Login/Register</router-link
           >
         </ul>
@@ -62,7 +62,7 @@
         <router-link class="link" to="#">Home</router-link>
         <router-link class="link" to="#">Blogs</router-link>
         <router-link class="link" to="#">Create Post</router-link>
-        <router-link class="link" :to="{ name: 'Login' }"
+        <router-link v-if="!user" class="link" :to="{ name: 'Login' }"
           >Login/Register</router-link
         >
       </ul>
