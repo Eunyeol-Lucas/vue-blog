@@ -66,7 +66,6 @@ export default new Vuex.Store({
       const dbResults = await getDoc(dataBase);
       commit("setProfileInfo", dbResults);
       commit("setProfileInitials");
-      console.log(dbResults.data());
     },
   },
   modules: {},
