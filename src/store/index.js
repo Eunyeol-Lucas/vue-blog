@@ -2,7 +2,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 import { getAuth } from "firebase/auth";
 import { dbService } from "../firebase/firebaseInit";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 
 Vue.use(Vuex);
 
@@ -59,12 +59,30 @@ export default new Vuex.Store({
         state.profileFirstName.match(/(\b\S)?/g).join("") +
         state.profileLastName.match(/(\b\S)?/g).join("");
     },
+    changeFirstName(state, payload) {
+      state.profileFirstName = payload;
+    },
+    changeLastName(state, payload) {
+      state.profileLastName = payload;
+    },
+    changeUsername(state, payload) {
+      state.profileUsername = payload;
+    },
   },
   actions: {
     async getCurrentUser({ commit }) {
       const dataBase = await doc(dbService, "users", getAuth().currentUser.uid);
       const dbResults = await getDoc(dataBase);
       commit("setProfileInfo", dbResults);
+      commit("setProfileInitials");
+    },
+    async updateUserSettings({ commit, state }) {
+      const dataBase = await doc(dbService, "users", state.profileId);
+      await updateDoc(dataBase, {
+        firstName: state.profileFirstName,
+        lastName: state.profileLastName,
+        username: state.profileUsername,
+      });
       commit("setProfileInitials");
     },
   },
