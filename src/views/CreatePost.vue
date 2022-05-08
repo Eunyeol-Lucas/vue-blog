@@ -55,7 +55,8 @@ import {
   getDownloadURL,
   uploadBytesResumable,
 } from "firebase/storage";
-// import { dbService } from "../firebase/firebaseInit";
+import { dbService } from "../firebase/firebaseInit";
+import { collection, doc, setDoc } from "@firebase/firestore";
 
 window.Quill = Quill;
 const ImageResize = require("quill-image-resize-module").default;
@@ -72,12 +73,12 @@ export default {
       file: null,
       error: null,
       errorMsg: null,
+      loading: null,
       editorSettings: {
         modules: {
           imageResize: {},
         },
       },
-      loading: null,
     };
   },
   methods: {
@@ -123,6 +124,41 @@ export default {
     uploadBlog() {
       if (this.blogTitle.length > 0 && this.blogHTML.length > 0) {
         if (this.file) {
+          this.loading = true;
+          const storage = getStorage();
+          const storageRef = ref(
+            storage,
+            `documents/BlogCoverPhotos/${this.$store.state.blogPhotoName}`
+          );
+          const uploadTask = uploadBytesResumable(storageRef, this.file);
+          uploadTask.on(
+            "state_changed",
+            (snapshot) => {
+              console.log(snapshot);
+            },
+            (err) => {
+              console.log(err);
+              this.loading = false;
+            },
+
+            async () => {
+              const downLoadURL = await getDownloadURL(uploadTask.snapshot.ref);
+              const timestamp = await Date.now();
+              const dataBase = await doc(collection(dbService, "blogPosts"));
+              await setDoc(dataBase, {
+                blogID: dataBase.id,
+                blogHTML: this.blogHTML,
+                blogCoverPhoto: downLoadURL,
+                blogCoverPhotoName: this.blogCoverPhotoName,
+                blogTitle: this.blogTitle,
+                profileId: this.profileId,
+                date: timestamp,
+              });
+              this.loading = false;
+              this.$router.push({ name: "ViewBlog" });
+            }
+          );
+
           return;
         }
         this.error = true;
@@ -141,8 +177,8 @@ export default {
     },
   },
   computed: {
-    profiledId() {
-      return this.$tore.state.profiledId;
+    profileId() {
+      return this.$store.state.profileId;
     },
     blogCoverPhotoName() {
       return this.$store.state.blogPhotoName;
