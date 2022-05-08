@@ -4,7 +4,7 @@
     <Loading v-show="loading" />
     <div class="container">
       <div :class="{ invisible: !error }" class="err-message">
-        <p><span>Error:</span>{{ this.errorMsg }}</p>
+        <p><span>Error: </span>{{ this.errorMsg }}</p>
       </div>
       <div class="blog-info">
         <input type="text" placeholder="Enter Blog Title" v-model="blogTitle" />
@@ -55,6 +55,7 @@ import {
   getDownloadURL,
   uploadBytesResumable,
 } from "firebase/storage";
+// import { dbService } from "../firebase/firebaseInit";
 
 window.Quill = Quill;
 const ImageResize = require("quill-image-resize-module").default;
@@ -119,7 +120,25 @@ export default {
         }
       );
     },
-    uploadBlog() {},
+    uploadBlog() {
+      if (this.blogTitle.length > 0 && this.blogHTML.length > 0) {
+        if (this.file) {
+          return;
+        }
+        this.error = true;
+        this.errorMsg = "Please ensure you uploaded a cover photo!";
+        setTimeout(() => {
+          this.error = false;
+        }, 5000);
+        return;
+      }
+      this.error = true;
+      this.errorMsg = "Please ensure Blog Title & BLog Post has been filled!";
+      setTimeout(() => {
+        this.error = false;
+      }, 5000);
+      return;
+    },
   },
   computed: {
     profiledId() {
@@ -194,6 +213,7 @@ export default {
   .err-message {
     width: 100%;
     padding: 12px;
+    border-radius: 8px;
     color: #fff;
     margin-bottom: 10px;
     background-color: #303030;
