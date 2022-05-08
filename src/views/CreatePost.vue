@@ -32,11 +32,14 @@
           :editorOptions="editorSettings"
           v-model="blogHTML"
           useCustomImageHandler
+          @image-added="imageHandler"
         />
       </div>
       <div class="blog-actions">
         <button @click="uploadBlog">Publish Blog</button>
-        <router-link class="router-button" to="#">Post Preview</router-link>
+        <router-link class="router-button" :to="{ name: 'BlogPreview' }"
+          >Post Preview</router-link
+        >
       </div>
     </div>
   </div>
@@ -46,6 +49,12 @@
 import Quill from "quill";
 import Loading from "../components/Loading.vue";
 import BlogCoverPreview from "../components/BlogCoverPreview.vue";
+import {
+  getStorage,
+  ref,
+  getDownloadURL,
+  uploadBytesResumable,
+} from "firebase/storage";
 
 window.Quill = Quill;
 const ImageResize = require("quill-image-resize-module").default;
@@ -79,6 +88,36 @@ export default {
     },
     openPreview() {
       this.$store.commit("openPhotoPreview");
+    },
+    imageHandler(file, Editor, cursorLocation, resetUploader) {
+      console.log(this.$store.state.profileAdmin);
+      const storage = getStorage();
+      const storageRef = ref(storage, `documents/blogPostPhotos/${file.name}`);
+      const uploadTask = uploadBytesResumable(storageRef, file);
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          console.log("Upload is " + progress + "% done");
+          switch (snapshot.state) {
+            case "paused":
+              console.log("Upload is paused");
+              break;
+            case "running":
+              console.log("Upload is running");
+              break;
+          }
+        },
+        (err) => {
+          console.log(err);
+        },
+        async () => {
+          const downLoadURL = await getDownloadURL(uploadTask.snapshot.ref);
+          Editor.insertEmbed(cursorLocation, "image", downLoadURL);
+          resetUploader();
+        }
+      );
     },
     uploadBlog() {},
   },
