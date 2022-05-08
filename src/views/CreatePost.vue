@@ -121,7 +121,7 @@ export default {
         }
       );
     },
-    uploadBlog() {
+    async uploadBlog() {
       if (this.blogTitle.length > 0 && this.blogHTML.length > 0) {
         if (this.file) {
           this.loading = true;
@@ -179,6 +179,9 @@ export default {
       }, 5000);
       return;
     },
+  },
+  created() {
+    this.$store.commit("setDefault");
   },
   computed: {
     profileId() {

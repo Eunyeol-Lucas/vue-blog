@@ -1,15 +1,11 @@
 <template>
   <div class="blog-card-wrap">
     <div class="blog-cards container">
-      <div class="toggle-edit">
+      <div v-if="profileAdmin" class="toggle-edit">
         <span>Toggle Editing Post</span>
         <input type="checkbox" v-model="editPost" />
       </div>
-      <BlogCard
-        :post="post"
-        v-for="(post, index) in blogPosts"
-        :key="index"
-      />
+      <BlogCard :post="post" v-for="(post, index) in blogPosts" :key="index" />
     </div>
   </div>
 </template>
@@ -33,6 +29,9 @@ export default {
       set(payload) {
         this.$store.commit("toggleEditPost", payload);
       },
+    },
+    profileAdmin() {
+      return this.$store.state.profileAdmin;
     },
   },
   beforeDestroy() {

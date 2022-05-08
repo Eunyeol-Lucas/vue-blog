@@ -61,6 +61,12 @@ export default new Vuex.Store({
     toggleEditPost(state, payload) {
       state.editPost = payload;
     },
+    setBlogState(state, payload) {
+      state.blogTitle = payload.blogTitle;
+      state.blogHTML = payload.blogHTML;
+      state.blogPhotoFileURL = payload.blogCoverPhoto;
+      state.blogPhotoName = payload.blogCoverPhotoName;
+    },
     filterBlogPost(state, payload) {
       state.blogPosts = state.blogPosts.filter(
         (post) => post.blogID !== payload
@@ -69,7 +75,7 @@ export default new Vuex.Store({
     updateUser(state, payload) {
       state.user = payload;
     },
-    serProfileAdmin(state, payload) {
+    setProfileAdmin(state, payload) {
       state.profileAdmin = payload;
     },
     setProfileInfo(state, payload) {
@@ -93,6 +99,12 @@ export default new Vuex.Store({
     changeUsername(state, payload) {
       state.profileUsername = payload;
     },
+    setDefault(state) {
+      state.blogTitle = null;
+      state.blogHTML = null;
+      state.blogPhotoFileURL = null;
+      state.blogPhotoName = null;
+    },
   },
   actions: {
     async getCurrentUser({ commit }, user) {
@@ -102,7 +114,7 @@ export default new Vuex.Store({
       commit("setProfileInitials");
       const token = await user.getIdTokenResult();
       const admin = await token.claims.admin;
-      commit("serProfileAdmin", admin);
+      commit("setProfileAdmin", admin);
     },
     async getPost({ state }) {
       const dataBase = await query(
@@ -118,11 +130,16 @@ export default new Vuex.Store({
             blogCoverPhoto: doc.data().blogCoverPhoto,
             blogTitle: doc.data().blogTitle,
             blogDate: doc.data().date,
+            blogCoverPhotoName: doc.data().blogCoverPhotoName,
           };
           state.blogPosts.push(data);
         }
       });
       state.postLoaded = true;
+    },
+    async updatePost({ commit, dispatch }, payload) {
+      commit("filterBlogPost", payload);
+      await dispatch("getPost");
     },
     async deletePost({ commit }, payload) {
       const getPost = await doc(dbService, "blogPosts", payload);
