@@ -2,7 +2,15 @@ import Vue from "vue";
 import Vuex from "vuex";
 import { getAuth } from "firebase/auth";
 import { dbService } from "../firebase/firebaseInit";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  orderBy,
+  query,
+  updateDoc,
+} from "firebase/firestore";
 
 Vue.use(Vuex);
 
@@ -46,6 +54,14 @@ export default new Vuex.Store({
     profileUsername: null,
     profileId: null,
     profileInitials: null,
+  },
+  getters: {
+    blogPostsFeed(state) {
+      return state.blogPosts.slice(0, 2);
+    },
+    blogPostsCards(state) {
+      return state.blogPosts.slice(2, 6);
+    },
   },
   mutations: {
     newBlogPost(state, payload) {
@@ -104,6 +120,28 @@ export default new Vuex.Store({
       const admin = await token.claims.admin;
       commit("serProfileAdmin", admin);
     },
+    async getPost({ state }) {
+      const dataBase = await query(
+        collection(dbService, "blogPosts"),
+        orderBy("date", "desc")
+      );
+      const dbResults = await getDocs(dataBase);
+      dbResults.forEach((doc) => {
+        if (!state.blogPosts.some((post) => post.blogID === doc.id)) {
+          const data = {
+            blogID: doc.data().blogID,
+            blogHTML: doc.data().blogHTML,
+            blogCoverPhoto: doc.data().blogCoverPhoto,
+            blogTitle: doc.data().blogTitle,
+            blogDate: doc.data().date,
+          };
+          state.blogPosts.push(data);
+        }
+      });
+      state.postLoaded = true;
+      console.log(state.blogPosts);
+    },
+
     async updateUserSettings({ commit, state }) {
       const dataBase = await doc(dbService, "users", state.profileId);
       await updateDoc(dataBase, {
