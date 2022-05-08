@@ -47,6 +47,10 @@ export default new Vuex.Store({
     updateUser(state, payload) {
       state.user = payload;
     },
+    serProfileAdmin(state, payload) {
+      state.profileAdmin = payload;
+      console.log(state.profileAdmin);
+    },
     setProfileInfo(state, payload) {
       state.profileId = payload.id;
       state.profileEmail = payload.data().email;
@@ -70,11 +74,14 @@ export default new Vuex.Store({
     },
   },
   actions: {
-    async getCurrentUser({ commit }) {
+    async getCurrentUser({ commit }, user) {
       const dataBase = await doc(dbService, "users", getAuth().currentUser.uid);
       const dbResults = await getDoc(dataBase);
       commit("setProfileInfo", dbResults);
       commit("setProfileInitials");
+      const token = await user.getIdTokenResult();
+      const admin = await token.claims.admin;
+      commit("serProfileAdmin", admin);
     },
     async updateUserSettings({ commit, state }) {
       const dataBase = await doc(dbService, "users", state.profileId);
