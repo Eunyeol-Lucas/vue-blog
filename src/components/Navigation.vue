@@ -201,6 +201,9 @@ header {
         border-radius: 50%;
         color: #fff;
         background-color: #303030;
+        @media (max-width: 750px) {
+          right: 40px;
+        }
 
         span {
           pointer-events: none;

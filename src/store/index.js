@@ -4,6 +4,7 @@ import { getAuth } from "firebase/auth";
 import { dbService } from "../firebase/firebaseInit";
 import {
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -59,6 +60,11 @@ export default new Vuex.Store({
     },
     toggleEditPost(state, payload) {
       state.editPost = payload;
+    },
+    filterBlogPost(state, payload) {
+      state.blogPosts = state.blogPosts.filter(
+        (post) => post.blogID !== payload
+      );
     },
     updateUser(state, payload) {
       state.user = payload;
@@ -117,9 +123,12 @@ export default new Vuex.Store({
         }
       });
       state.postLoaded = true;
-      console.log(state.blogPosts);
     },
-
+    async deletePost({ commit }, payload) {
+      const getPost = await doc(dbService, "blogPosts", payload);
+      await deleteDoc(getPost);
+      commit("filterBlogPost", payload);
+    },
     async updateUserSettings({ commit, state }) {
       const dataBase = await doc(dbService, "users", state.profileId);
       await updateDoc(dataBase, {
